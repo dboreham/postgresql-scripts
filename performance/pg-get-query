@@ -1,0 +1,13 @@
+#!/bin/sh
+USAGE="$0 <pg-uri> <query-id>"
+if [ -z "$1" ]
+  then
+    echo $USAGE
+    exit 1
+fi
+if [ -z "$2" ]
+  then
+    echo $USAGE
+    exit 1
+fi
+psql -A -P pager=off -t -c "select query from public.pg_stat_statements where queryid = $2" $1 | sql-formatter-cli -i -

@@ -1,0 +1,8 @@
+#!/bin/sh
+if [ -z "$1" ]
+  then
+    echo "Usage: $0 <pg-uri>"
+    exit 1
+fi
+QUERY="select queryid, trunc(shared_blks_dirtied * 100.0 / sum(shared_blks_dirtied) over()) as \"% blocks\", shared_blks_dirtied as blocks, trunc(mean_exec_time) as \"avg time\", calls, substring(query for 40) || '...' as \"query\" from public.pg_stat_statements order by shared_blks_dirtied desc limit 10"
+psql -c "$QUERY" $1

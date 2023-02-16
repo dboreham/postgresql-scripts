@@ -1,0 +1,7 @@
+#!/bin/sh
+if [ -z "$1" ]
+  then
+    echo "Usage: $0 <pg-uri>"
+    exit 1
+fi
+psql -c "select pg_stat_statements_reset()" $1

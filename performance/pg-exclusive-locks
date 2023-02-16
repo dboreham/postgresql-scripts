@@ -1,0 +1,19 @@
+#!/bin/sh
+if [ -z "$1" ]
+  then
+    echo "Usage: $0 <pg-uri>"
+    exit 1
+fi
+QUERY="SELECT pl.pid,
+       locktype,
+       CASE locktype
+         WHEN 'relation' THEN relation::regclass::text
+         WHEN 'virtualxid' THEN virtualxid::text
+         WHEN 'tuple' THEN relation::regclass::text||':'||tuple::text
+       END AS lockid,
+       mode,
+       granted, substring(query for 40) || '...' as \"query\"
+FROM pg_locks pl LEFT JOIN pg_stat_activity psa
+    ON pl.pid = psa.pid WHERE mode in ('RowShareLock', 'RowExclusiveLock', 'AccessExclusiveLock', 'ShareUpdateExclusiveLock')"
+
+psql -P pager=off -c "$QUERY" $1

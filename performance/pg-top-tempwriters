@@ -1,0 +1,8 @@
+#!/bin/sh
+if [ -z "$1" ]
+  then
+    echo "Usage: $0 <pg-uri>"
+    exit 1
+fi
+QUERY="select queryid, trunc(temp_blks_written * 100.0 / sum(temp_blks_written) over()) as \"% temp blocks\", trunc(mean_exec_time) as \"avg time\", calls, substring(query for 40) || '...' as \"query\" from public.pg_stat_statements order by temp_blks_written desc limit 10"
+psql -c "$QUERY" $1

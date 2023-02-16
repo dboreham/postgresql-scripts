@@ -1,0 +1,12 @@
+#!/bin/sh
+if [ -z "$1" ]
+  then
+    echo "Usage: $0 <pg-uri>"
+    exit 1
+fi
+QUERY="SELECT distinct pl.pid, now() - xact_start as \"runtime\",
+       granted, substring(query for 40) || '...' as \"query\"
+FROM pg_locks pl LEFT JOIN pg_stat_activity psa
+    ON pl.pid = psa.pid WHERE mode in ('RowShareLock', 'RowExclusiveLock')"
+
+psql -c "$QUERY" $1
